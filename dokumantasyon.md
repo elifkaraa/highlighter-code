@@ -28,8 +28,8 @@ Kod örneği:
 
 ## 2.2 Parser
 Top-down yaklaşımıyla çalışan parse, parse_expression, parse_if gibi fonksiyonlarla gramer kontrolü yapılır.
-# Token Tanımı
-## Tanımlanan Token Türleri
+# 3 Token Tanımı
+## 3.1 Tanımlanan Token Türleri
 |     Türü  |    Açıklama              |
 |--------------|-----------------------|
 | keywords     | Anahtar kelimeler     |
@@ -39,6 +39,39 @@ Top-down yaklaşımıyla çalışan parse, parse_expression, parse_if gibi fonks
 | operators     | +, -, *, /, = vb.     |
 | delimiters  | Noktalama karakterleri|
 | comment      | Açıklama satırları    |
+## 3.2 Tokenizer Kullanımı
+Tokenizer, kullanıcıdan alınan kaynak kodu parçalara (token'lara) ayırır ve her token için aşağıdaki bilgileri içeren nesneler döner:
 
+type: Token türü (örneğin KEYWORD, IDENTIFIER, NUMBER, STRING, OPERATOR, DELIMITER, COMMENT, INVALID)
+
+lexeme: Kaynak koddan alınan orijinal kelime/parça (örneğin if, varName, 123, "hello", +, {, // yorum)
+# 4. Parser Fonksiyonları
+## 4.1 Top-Down Yöntemi
+Parser, yukarıdan aşağıya doğru çalışır. Yani önce daha geniş yapılar (örneğin bir ifade, koşul veya blok) analiz edilir, sonra bunlar alt bileşenlerine ayrılır. Bu sayede kodun geçerli yapıda olup olmadığı kontrol edilir.
+
+## 4.2 Fonksiyon Açıklamaları
+- parse(input):
+Girdi olarak aldığı kaynak kodunu tokenize eder, ardından token dizisi üzerinde sırayla parse_if(), parse_switch() ve parse_expression() fonksiyonlarını çağırarak kodun sözdizimini kontrol eder.
+
+- parse_if():
+if bloğunu işler. if anahtar kelimesini, ardından parantez içindeki koşul ifadesini ve süslü parantezler içindeki blok yapısını doğrular.
+
+- parse_switch():
+switch yapısını işler. switch anahtar kelimesi, parantez içindeki ifade ve süslü parantezler içindeki case/default bloklarını kontrol eder.
+
+- parse_case():
+switch içindeki case ve default bloklarını işler. Her case ifadesini, ardından gelen değeri, : sembolünü, kod bloğunu ve break; ifadesini kontrol eder.
+
+- parse_expression():
+Atama, karşılaştırma ve basit ifadeleri kontrol eder. Örneğin, değişken atamaları (x = 5), karşılaştırmalar (x == 10) veya tek başına değişken ve sayısal değerleri işler.
+
+- parse_block():
+{ ... } içindeki kod bloğunu işler. Blok içinde if, switch veya ifade satırlarını tekrarlar.
+
+- match(type, lexeme = null):
+Şu anki token’ın türünü ve isteğe bağlı olarak değerini kontrol eder, eşleşiyorsa ilerler, değilse hata fırlatır.
+
+- check(type, lexeme = null):
+Şu anki token’ın türünü ve isteğe bağlı olarak değerini kontrol eder ancak ilerleme yapmaz.
 
 
