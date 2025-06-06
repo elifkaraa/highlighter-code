@@ -23,7 +23,22 @@ Tanımlayıcılar: değişken isimleri
 Operatörler: =, +, -, vb.
 Sayısal değerler
 Semboller: (, ), {, }, ;
+Kod örneği:
+![image](https://github.com/user-attachments/assets/5a072538-1e16-49aa-ab8f-4a9b7870e116)
+
 ## 2.2 Parser
 Top-down yaklaşımıyla çalışan parse, parse_expression, parse_if gibi fonksiyonlarla gramer kontrolü yapılır.
-![image](https://github.com/user-attachments/assets/0d6bcc09-1669-4ee7-8493-7aa8c30045e2)
+# Token Tanımı
+## Tanımlanan Token Türleri
+|     Türü  |    Açıklama              |
+|--------------|-----------------------|
+| keywords     | Anahtar kelimeler     |
+| identifier   | Değişken adları       |
+| number       | Sayısal sabitler      |
+| string       | Karakter dizileri     |
+| operators     | +, -, *, /, = vb.     |
+| delimiters  | Noktalama karakterleri|
+| comment      | Açıklama satırları    |
+
+
 
