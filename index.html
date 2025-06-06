@@ -1,34 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        body{
-            background-color: #f8e1ee;
-        }
-         textarea {
-            width: 100%;
-            height: 200px;
-            font-family: monospace;
-            font-size: 16px;
-        }
-         pre {
-            background: #fffdfff6;
-            padding: 10px;
-            white-space: pre-wrap;
-            height:max-content;
-            width: 300px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      background-color: #f8e1ee;
     }
-    .token-KEYWORD { color: blue; font-weight: bold; }
-    .token-IDENTIFIER { color: black; }
-    .token-NUMBER { color: darkorange; }
-    .token-OPERATOR { color: red; }
-    .token-DELIMITER { color: green; }
-    .token-COMMENT { color: gray; font-style: italic; }
-    .token-INVALID { background-color: red; color: white; }
-    .token-STRING { color: purple; }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      font-family: monospace;
+      font-size: 16px;
+    }
+
+    pre {
+      background: #fffdfff6;
+      padding: 10px;
+      white-space: pre-wrap;
+      height: max-content;
+      width: 300px;
+    }
+
+    .token-KEYWORD {
+      color: blue;
+      font-weight: bold;
+    }
+
+    .token-IDENTIFIER {
+      color: black;
+    }
+
+    .token-NUMBER {
+      color: darkorange;
+    }
+
+    .token-OPERATOR {
+      color: red;
+    }
+
+    .token-DELIMITER {
+      color: green;
+    }
+
+    .token-COMMENT {
+      color: gray;
+      font-style: italic;
+    }
+
+    .token-INVALID {
+      background-color: red;
+      color: white;
+    }
+
+    .token-STRING {
+      color: purple;
+    }
 
     .output-box {
       display: flex;
@@ -44,13 +74,13 @@
     h3 {
       margin-bottom: 5px;
     }
-
-    </style>
+  </style>
 </head>
+
 <body>
-    <h2>Kod Editörü</h2>
-    <textarea id="kod" placeholder="Kodunuzu buraya giriniz."></textarea>
-    <div class="output-box">
+  <h2>Kod Editörü</h2>
+  <textarea id="kod" placeholder="Kodunuzu buraya giriniz."></textarea>
+  <div class="output-box">
     <div>
       <h3>Vurgulu Kod:</h3>
       <pre id="output"></pre>
@@ -59,410 +89,419 @@
       <h3>Token Listesi:</h3>
       <pre id="currentTokens"></pre>
     </div>
-    </div>
-    <script>
+  </div>
+  <script>
     //TOKENİZER KISMI
-const keywords = ['if', 'else', 'while', 'return','for','const','let','var','function','switch','case','break','class','continue','import',
-'export','try','catch','finally','throw','new','this','typeof','instanceof'];
-const operators = ['==', '=', '===','!=','!==','>','<','>=','<=','+', '-', '*', '/','%','**','||','&&','!','+=','-=','*=','%=','/=','++',
-  '--','?:','//','/*','*/'];
-const delimiters =[',',';','.','(',')','{','}','[',']'];
-// Anahtar kelimeler,operatörler ve noktalamalar için sabitler tanımladık
+    const keywords = ['if', 'else', 'while', 'return', 'for', 'const', 'let', 'var', 'function', 'switch', 'case', 'break', 'class', 'continue', 'import',
+      'export', 'try', 'catch', 'finally', 'throw', 'new', 'this', 'typeof', 'instanceof'];
+    const operators = ['==', '=', '===', '!=', '!==', '>', '<', '>=', '<=', '+', '-', '*', '/', '%', '**', '||', '&&', '!', '+=', '-=', '*=', '%=', '/=', '++',
+      '--', '?:', '//', '/*', '*/'];
+    const delimiters = [',', ';', '.', '(', ')', '{', '}', '[', ']'];
+    // Anahtar kelimeler,operatörler ve noktalamalar için sabitler tanımladık
 
-function isAlpha(ch) {
-  return /^[a-zA-Z]$/.test(ch);
-}//Harf içerip içermediğini kontrol eden fonksiyon
-function isAlnum(ch) {
-  return /^[a-zA-Z0-9]$/.test(ch);
-}//Sayı ve harf içerip içermediğini kontrol eden fonksiyon
-function isDigit(ch) {
-  return /^[0-9]$/.test(ch);
-}//Sayı içerip içermediğini kontrol eden fonksiyon
+    function isAlpha(ch) {
+      return /^[a-zA-Z]$/.test(ch);
+    }//Harf içerip içermediğini kontrol eden fonksiyon
+    function isAlnum(ch) {
+      return /^[a-zA-Z0-9]$/.test(ch);
+    }//Sayı ve harf içerip içermediğini kontrol eden fonksiyon
+    function isDigit(ch) {
+      return /^[0-9]$/.test(ch);
+    }//Sayı içerip içermediğini kontrol eden fonksiyon
 
-function getNextToken(sourceObj) { //Tokenizer fonksiyonu
-  let src = sourceObj.src;
-  let i = 0;
+    function getNextToken(sourceObj) { //Tokenizer fonksiyonu
+      let src = sourceObj.src;
+      let i = 0;
 
- while (i < src.length && /\s/.test(src[i])) i++;
+      while (i < src.length && /\s/.test(src[i])) i++;
 
-  // String kontrolü
-if (src[i] === '"' || src[i] === "'") {
-  const degisken = src[i]; // ' veya "
-  let lexeme = degisken;
-  i++;
+      // String kontrolü
+      if (src[i] === '"' || src[i] === "'") {
+        const degisken = src[i]; // ' veya "
+        let lexeme = degisken;
+        i++;
 
-  while (i < src.length && src[i] !== degisken) {
-    lexeme += src[i++];
-  }
-
-  if (src[i] === degisken) {
-    lexeme += src[i++]; // Kapanış tırnağını da eklemek için
-    sourceObj.src = src.slice(i);
-    return { type: 'STRING', lexeme };
-  } else {
-    // Tırnak kapanmamışsa geçersiz say
-    sourceObj.src = src.slice(i);
-    return { type: 'INVALID', lexeme };
-  }
-}
-
-
-  src = src.slice(i);
-  i = 0;
-//Harf kontrolü
-  if (isAlpha(src[i])) {
-    let lexeme = '';
-    while (i < src.length && isAlnum(src[i])) {
-      lexeme += src[i++];
-    }
-
-    sourceObj.src = src.slice(i);
-
-    if (keywords.includes(lexeme)) {
-      return { type: 'KEYWORD', lexeme };
-    } 
-    else {
-      return { type: 'IDENTIFIER', lexeme };
-    }
-  }
-//Sayı kontrolü
-  if (isDigit(src[i])) {
-    let lexeme = '';
-    while (i < src.length && isDigit(src[i])) {
-      lexeme += src[i++];
-    }
-    sourceObj.src = src.slice(i);
-    return { type: 'NUMBER', lexeme };
-  }
-//Operatör kontrolü
-//Çoklu operatörleri tek tek if ler ile kontrol ettim
-if (src.startsWith('===')) {
-    sourceObj.src = src.slice(3);
-    return { type: 'OPERATOR', lexeme: '===' };
-  }
-  if (src.startsWith('==')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '==' };
-  }
-  if (src.startsWith('!==')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '!==' };
-  }
-  if (src.startsWith('!=')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '!=' };
-  }
-  if (src.startsWith('>=')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '>=' };
-  }
-  if (src.startsWith('<=')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '<=' };
-  }
-  if (src.startsWith('**')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '**' };
-  }
-  if (src.startsWith('||')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '||' };
-  }
-  if (src.startsWith('&&')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '&&' };
-  }
-  if (src.startsWith('+=')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '+=' };
-  }
-  if (src.startsWith('-=')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '-=' };
-  }
-  if (src.startsWith('*=')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '*=' };
-  }
-  if (src.startsWith('/=')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '/=' };
-  }
-   if (src.startsWith('%=')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '%=' };
-  }
-  if (src.startsWith('++')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '++' };
-  }
-  if (src.startsWith('--')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '--' };
-  }
-   if (src.startsWith('?:')) {
-    sourceObj.src = src.slice(2);
-    return { type: 'OPERATOR', lexeme: '?:' };
-  }
-  //Comment kontrolü (tek satır için //)
-if (src.startsWith('//')) {
-  let lexeme = '';
-  while (i < src.length && src[i] !== '\n') {
-    lexeme += src[i++];
-  }
-  sourceObj.src = src.slice(i);
-  return { type: 'COMMENT', lexeme };
-}
-// Birden fazla satır için (/* */)
-if (src.startsWith('/*')) {
-  let lexeme = '';
-  lexeme += src[i++]; // /
-  lexeme += src[i++]; // *
-  while (i < src.length && !(src[i - 1] === '*' && src[i] === '/')) {
-    lexeme += src[i++];
-  }
-  if (i < src.length) {
-    lexeme += src[i++]; 
-  }
-  sourceObj.src = src.slice(i);
-  return { type: 'COMMENT', lexeme };
-}
-
-
-  if (operators.includes(src[0])) {
-    sourceObj.src = src.slice(1);
-    return { type: 'OPERATOR', lexeme: src[0] };
-  }
-//Noktalama kontrolü
-  if (delimiters.includes(src[0])) {
-    sourceObj.src = src.slice(1);
-    return { type: 'DELIMITER', lexeme: src[0] };
-  }
-
-  
-//Bunlardan hiçbiriyse tanımsız
-  sourceObj.src = src.slice(1);
-  return { type: 'INVALID', lexeme: src[0] };
-}
-
-function tokenize(input) {
-  const tokens = [];
-  const sourceObj = { src: input };
-
-  while (sourceObj.src.length > 0) {
-    const token = getNextToken(sourceObj);
-    tokens.push(token);
-  }
-
-  return tokens;
-}
-//PARSER KISMI
-let tokens=[];
-let degisken=0;
-function parse(input) {
-  tokens = tokenize(input);
-  degisken = 0;
-  let lastError = null;
-
-  while (degisken < tokens.length) {
-    let parsed = false;
-
-    try {
-      if (parse_if()) parsed = true;
-    } catch (e) {
-      lastError = e;
-    }
-
-    try {
-      if (parse_switch()) parsed = true;
-    } catch (e) {
-      lastError = e;
-    }
-
-    try {
-      if (parse_expression() && match('DELIMITER', ';')) parsed = true;
-    } catch (e) {
-      lastError = e;
-    }
-
-    if (!parsed) {
-      throw lastError || new Error(`Geçersiz ifade: ${tokens[degisken].lexeme}`);
-    }
-  }
-
-  return true;
-}
-function parse_if() {
-  if (!check('KEYWORD', 'if')) return false;
-  match('KEYWORD', 'if');
-
-  if (!check('DELIMITER', '(')) throw new Error("'if' bloğunda açılış parantezi '(' eksik.");
-  match('DELIMITER', '(');
-
-  if (!parse_expression()) throw new Error("'if' bloğunda geçerli bir ifade bekleniyor.");
-
-  if (!check('DELIMITER', ')')) throw new Error("'if' bloğunda kapanış parantezi ')' eksik.");
-  match('DELIMITER', ')');
-
-  if (!check('DELIMITER', '{')) {
-  throw new Error("'if' bloğunda açılış süslü parantez '{' eksik.");
-}
-match('DELIMITER', '{');
-
-// Blok parse et
-parse_block();
-
-if (!check('DELIMITER', '}')) {
-  throw new Error("'if' bloğunda kapanış süslü parantez '}' eksik.");
-}
-match('DELIMITER', '}');
-  return true;
-}
-
- function check(type, lexeme = null) {
-  if (degisken >= tokens.length) return false;
-  const token = tokens[degisken];
-  if (token.type !== type) return false;
-  if (lexeme !== null && token.lexeme !== lexeme) return false;
-  return true;
-}
-
-
-function parse_block() {
-  while (degisken < tokens.length) {
-    const prev = degisken;
-    try {
-      if (parse_if() || parse_switch() || (parse_expression() && match('DELIMITER', ';'))) {
-        continue;
-      }
-    } catch {
-      break;
-    }
-
-    if (degisken === prev) break; // ilerleme yoksa çık
-  }
-  return true;
-}
-
-function parse_expression() {
-  if (match('IDENTIFIER')) {
-    // Atama, karşılaştırma gibi ifadeler kontrolü
-    if (match('OPERATOR', '=')) {
-      if (!(match('NUMBER') || match('IDENTIFIER'))) {
-        throw new Error("Atama ifadesinde sağ taraf geçersiz.");
-      }
-      return true;
-    }
-    if (match('OPERATOR', '==') && match('NUMBER')) {
-      return true;
-    }
-    return true; // sadece değişken olabilir
-  } else if (match('NUMBER')) {
-    return true;
-  }
-  return false;
-}
-
-
-
-function parse_switch() {
-  if (
-    match('KEYWORD', 'switch') &&
-    match('DELIMITER', '(') &&
-    parse_expression() &&
-    match('DELIMITER', ')') &&
-    match('DELIMITER', '{') &&
-    parse_case() &&
-    match('DELIMITER', '}')
-  ) {
-    return true;
-  }
-  return false;
-}
-function parse_case() {
-  while (true) {
-    if (match('KEYWORD', 'case')) {
-      if (
-        match('NUMBER') || match('STRING') || match('IDENTIFIER') 
-      ) {
-        if (
-          match('DELIMITER', ':') &&
-          parse_if() &&
-          match('KEYWORD', 'break') &&
-          match('DELIMITER', ';')
-        ) {
-          continue; // Diğer case'lere ilerletmek için
-        } else {
-          return false;
+        while (i < src.length && src[i] !== degisken) {
+          lexeme += src[i++];
         }
-      } else {
-        return false;
+
+        if (src[i] === degisken) {
+          lexeme += src[i++]; // Kapanış tırnağını da eklemek için
+          sourceObj.src = src.slice(i);
+          return { type: 'STRING', lexeme };
+        } else {
+          // Tırnak kapanmamışsa geçersiz say
+          sourceObj.src = src.slice(i);
+          return { type: 'INVALID', lexeme };
+        }
       }
-    } else if (match('KEYWORD', 'default')) {
+
+
+      src = src.slice(i);
+      i = 0;
+      //Harf kontrolü
+      if (isAlpha(src[i])) {
+        let lexeme = '';
+        while (i < src.length && isAlnum(src[i])) {
+          lexeme += src[i++];
+        }
+
+        sourceObj.src = src.slice(i);
+
+        if (keywords.includes(lexeme)) {
+          console.log("*** keyword: ", lexeme);
+          return { type: 'KEYWORD', lexeme };
+        }
+        else {
+          return { type: 'IDENTIFIER', lexeme };
+        }
+      }
+      //Sayı kontrolü
+      if (isDigit(src[i])) {
+        let lexeme = '';
+        while (i < src.length && isDigit(src[i])) {
+          lexeme += src[i++];
+        }
+        sourceObj.src = src.slice(i);
+        return { type: 'NUMBER', lexeme };
+      }
+      //Operatör kontrolü
+      //Çoklu operatörleri tek tek if ler ile kontrol ettim
+      if (src.startsWith('===')) {
+        sourceObj.src = src.slice(3);
+        return { type: 'OPERATOR', lexeme: '===' };
+      }
+      if (src.startsWith('==')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '==' };
+      }
+      if (src.startsWith('!==')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '!==' };
+      }
+      if (src.startsWith('!=')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '!=' };
+      }
+      if (src.startsWith('>=')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '>=' };
+      }
+      if (src.startsWith('<=')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '<=' };
+      }
+      if (src.startsWith('**')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '**' };
+      }
+      if (src.startsWith('||')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '||' };
+      }
+      if (src.startsWith('&&')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '&&' };
+      }
+      if (src.startsWith('+=')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '+=' };
+      }
+      if (src.startsWith('-=')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '-=' };
+      }
+      if (src.startsWith('*=')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '*=' };
+      }
+      if (src.startsWith('/=')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '/=' };
+      }
+      if (src.startsWith('%=')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '%=' };
+      }
+      if (src.startsWith('++')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '++' };
+      }
+      if (src.startsWith('--')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '--' };
+      }
+      if (src.startsWith('?:')) {
+        sourceObj.src = src.slice(2);
+        return { type: 'OPERATOR', lexeme: '?:' };
+      }
+      //Comment kontrolü (tek satır için //)
+      if (src.startsWith('//')) {
+        let lexeme = '';
+        while (i < src.length && src[i] !== '\n') {
+          lexeme += src[i++];
+        }
+        sourceObj.src = src.slice(i);
+        return { type: 'COMMENT', lexeme };
+      }
+      // Birden fazla satır için (/* */)
+      if (src.startsWith('/*')) {
+        let lexeme = '';
+        lexeme += src[i++]; // /
+        lexeme += src[i++]; // *
+        while (i < src.length && !(src[i - 1] === '*' && src[i] === '/')) {
+          lexeme += src[i++];
+        }
+        if (i < src.length) {
+          lexeme += src[i++];
+        }
+        sourceObj.src = src.slice(i);
+        return { type: 'COMMENT', lexeme };
+      }
+
+
+      if (operators.includes(src[0])) {
+        sourceObj.src = src.slice(1);
+        return { type: 'OPERATOR', lexeme: src[0] };
+      }
+      //Noktalama kontrolü
+      console.log("*** src: ", src);
+      if (delimiters.includes(src[0])) {
+        sourceObj.src = src.slice(1);
+        return { type: 'DELIMITER', lexeme: src[0] };
+      }
+
+
+      //Bunlardan hiçbiriyse tanımsız
+      sourceObj.src = src.slice(1);
+      return { type: 'INVALID', lexeme: src[0] };
+    }
+
+    function tokenize(input) {
+      const tokens = [];
+      const sourceObj = { src: input };
+
+      while (sourceObj.src.length > 0) {
+        const token = getNextToken(sourceObj);
+        console.log("*** token: ", token);
+        tokens.push(token);
+      }
+
+      return tokens;
+    }
+    //PARSER KISMI
+    let tokens = [];
+    let degisken = 0;
+    function parse(input) {
+      tokens = tokenize(input);
+      console.log("*** tokens: ", tokens);
+      degisken = 0;
+      let lastError = null;
+
+      while (degisken < tokens.length) {
+        let parsed = false;
+
+        try {
+          if (parse_if()  &&  match('DELIMITER', '(')) parsed = true;
+        } catch (e) {
+          lastError = e;
+        }
+
+        try {
+          if (parse_switch()) parsed = true;
+        } catch (e) {
+          lastError = e;
+        }
+
+        try {
+          if (parse_expression() && match('DELIMITER', ';')) parsed = true;
+        } catch (e) {
+          lastError = e;
+        }
+
+        if (!parsed) {
+          throw lastError || new Error(`Geçersiz ifade: ${tokens[degisken].lexeme}`);
+        }
+      }
+
+      return true;
+    }
+    function parse_if() {
+
+      // if (!check('KEYWORD', 'if')) {
+      //   return false;
+      // };
+      match('KEYWORD', 'if');
+
+      if (!check('DELIMITER', '(')) throw new Error("'if' bloğunda açılış parantezi '(' eksik.");
+      match('DELIMITER', '(');
+
+      if (!parse_expression()) throw new Error("'if' bloğunda geçerli bir ifade bekleniyor.");
+
+      if (!check('DELIMITER', ')')) throw new Error("'if' bloğunda kapanış parantezi ')' eksik.");
+      match('DELIMITER', ')');
+
+      if (!check('DELIMITER', '{')) {
+        throw new Error("'if' bloğunda açılış süslü parantez '{' eksik.");
+      }
+      match('DELIMITER', '{');
+
+      // Blok parse et
+      parse_block();
+
+      if (!check('DELIMITER', '}')) {
+        throw new Error("'if' bloğunda kapanış süslü parantez '}' eksik.");
+      }
+      match('DELIMITER', '}');
+
+      return true;
+    }
+
+    function check(type, lexeme = null) {
+      if (degisken >= tokens.length) return false;
+      const token = tokens[degisken];
+      if (token.type !== type) return false;
+      if (lexeme !== null && token.lexeme !== lexeme) return false;
+      return true;
+    }
+
+
+    function parse_block() {
+      while (degisken < tokens.length) {
+        const prev = degisken;
+        try {
+          if (parse_if() || parse_switch() || (parse_expression() && match('DELIMITER', ';'))) {
+            continue;
+          }
+        } catch {
+          break;
+        }
+
+        if (degisken === prev) break; // ilerleme yoksa çık
+      }
+      return true;
+    }
+
+    function parse_expression() {
+      if (match('IDENTIFIER')) {
+        // Atama, karşılaştırma gibi ifadeler kontrolü
+        if (match('OPERATOR', '=')) {
+          if (!(match('NUMBER') || match('IDENTIFIER'))) {
+            throw new Error("Atama ifadesinde sağ taraf geçersiz.");
+          }
+          return true;
+        }
+        if (match('OPERATOR', '==') && match('NUMBER')) {
+          return true;
+        }
+        return true; // sadece değişken olabilir
+      } else if (match('NUMBER')) {
+        return true;
+      }
+      return false;
+    }
+
+
+
+    function parse_switch() {
       if (
-        match('DELIMITER', ':') &&
-        parse_if()
+        match('KEYWORD', 'switch') &&
+        match('DELIMITER', '(') &&
+        parse_expression() &&
+        match('DELIMITER', ')') &&
+        match('DELIMITER', '{') &&
+        parse_case() &&
+        match('DELIMITER', '}')
       ) {
-        return true; // Default son case ise
-      } else {
-        return false;
+        return true;
       }
-    } else {
-      break; // Case veya default yoksa çık
+      return false;
     }
-  }
-  return true;
-}
-function match(type, lexeme = null) {
-  console.log("*** type: ", type);
-  console.log("*** lexeme: ", lexeme);
-  if (degisken >= tokens.length) {
-    console.log("*** step 5");
-    throw new Error(`Beklenmeyen dosya sonu. Beklenen: ${type} ${lexeme ?? ''}`);
-  }
+    function parse_case() {
+      while (true) {
+        if (match('KEYWORD', 'case')) {
+          if (
+            match('NUMBER') || match('STRING') || match('IDENTIFIER')
+          ) {
+            if (
+              match('DELIMITER', ':') &&
+              parse_if() &&
+              match('KEYWORD', 'break') &&
+              match('DELIMITER', ';')
+            ) {
+              continue; // Diğer case'lere ilerletmek için
+            } else {
+              return false;
+            }
+          } else {
+            return false;
+          }
+        } else if (match('KEYWORD', 'default')) {
+          if (
+            match('DELIMITER', ':') &&
+            parse_if()
+          ) {
+            return true; // Default son case ise
+          } else {
+            return false;
+          }
+        } else {
+          break; // Case veya default yoksa çık
+        }
+      }
+      return true;
+    }
+    function match(type, lexeme = null) {
+      console.log("*** type: ", type);
+      console.log("*** lexeme: ", lexeme);
+      if (degisken >= tokens.length) {
+        console.log("*** step 5");
+        throw new Error(`Beklenmeyen dosya sonu. Beklenen: ${type} ${lexeme ?? ''}`);
+      }
 
-  const token = tokens[degisken];
-  if (token.type === type && (lexeme === null || token.lexeme === lexeme)) {
-    degisken++;
-    return true;
-  }
+      const token = tokens[degisken];
+      if (token.type === type && (lexeme === null || token.lexeme === lexeme)) {
+        degisken++;
+        return true;
+      }
 
-  throw new Error(`Beklenen token: ${type} "${lexeme ?? ''}", fakat bulunan: ${token.type} "${token.lexeme}"`);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('kod').addEventListener('input', () => {
-    const code = document.getElementById('kod').value;
-    const currentTokens = tokenize(code);
-     tokens = currentTokens;
-
-    let highlighted = '';
-    for (const t of currentTokens) {
-      highlighted += `<span class="token-${t.type}">${escapeHTML(t.lexeme)}</span> `;
+      throw new Error(`Beklenen token: ${type} "${lexeme ?? ''}", fakat bulunan: ${token.type} "${token.lexeme}"`);
     }
 
-    let tokenOutput = currentTokens.map(t => `[${t.type}] "${t.lexeme}"`).join('\n');
-    let parseResult = '';
-    try {
-      parse(code);
-      parseResult = '\n\n Geçerli ifade.';
-    } catch (e) {
-      parseResult = '\n\n' + e.message;
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('kod').addEventListener('input', () => {
+        const code = document.getElementById('kod').value;
+        const currentTokens = tokenize(code);
+        tokens = currentTokens;
+
+        let highlighted = '';
+        for (const t of currentTokens) {
+          highlighted += `<span class="token-${t.type}">${escapeHTML(t.lexeme)}</span> `;
+        }
+
+        let tokenOutput = currentTokens.map(t => `[${t.type}] "${t.lexeme}"`).join('\n');
+        let parseResult = '';
+        try {
+          parse(code);
+          parseResult = '\n\n Geçerli ifade.';
+        } catch (e) {
+          parseResult = '\n\n' + e.message;
+        }
+
+        document.getElementById('output').innerHTML = highlighted;
+        document.getElementById('currentTokens').textContent = tokenOutput + parseResult;
+      });
+    });
+
+
+    function escapeHTML(str) {
+      if (str === null || str === undefined) return str;
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
     }
-
-    document.getElementById('output').innerHTML = highlighted;
-    document.getElementById('currentTokens').textContent = tokenOutput + parseResult;
-  });
-});
-
-
-function escapeHTML(str) {
-  if (str === null || str === undefined) return str;
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-</script>
+  </script>
 </body>
+
 </html>
