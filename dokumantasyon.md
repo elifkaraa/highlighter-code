@@ -73,5 +73,32 @@ Atama, karşılaştırma ve basit ifadeleri kontrol eder. Örneğin, değişken 
 
 - check(type, lexeme = null):
 Şu anki token’ın türünü ve isteğe bağlı olarak değerini kontrol eder ancak ilerleme yapmaz.
+# 5. GUI ve Gerçek Zamanlı Vurgulama
+## 5.1 Kullanıcı Arayüzü
+Kullanıcı, metin kutusuna kod yazdıkça, tokenize(input) fonksiyonu çağrılarak kod tokenlara ayrılır. Tokenlar, türlerine göre farklı CSS sınıflarıyla işaretlenir ve sonuç olarak metin kutusu veya kod gösterim alanında renklendirilmiş olarak gösterilir.
+
+## 5.2 CSS Stil Tanımları
+Token dizisi üzerinde döngü kurularak, her token'ın tipi kontrol edilir ve uygun CSS sınıfı atanır. Bu sayede sözdizim vurgulaması yapılır. Örneğin:
+
+- KEYWORD türündeki tokenlar .token-KEYWORD sınıfı ile,
+
+- IDENTIFIER türündekiler  .token-IDENTIFIER ile,
+
+- OPERATOR türündekiler   .token-OPERATOR ile,
+
+- NUMBER türündekiler  .token-NUMBER ile,
+
+- STRING türündekiler .token-STRING  ile,
+
+- COMMENT türündekiler .token-COMMENT ile,
+
+- DELIMITER türündekiler .token-DELIMITER ile,
+- INVALID türündekiler .token-INVALID ile  renklendirilir.
+# 6.  Proje Özeti ve Değerlendirme
+Bu projede, JavaScript ile yazılmış, gerçek zamanlı çalışan bir sözdizimi analizi ve vurgulama sistemi geliştirilmiştir. Proje, tokenize etme (lexer) ve üstten aşağıya (top-down) parse işlemleri ile kaynak kodun yapısını kontrol eder. Kullanıcıdan alınan kod, anlık olarak tokenize edilip parçalara ayrılır; ardından parse fonksiyonlarıyla geçerlilik denetimi yapılır.
+
+Kodun sözdizimi hataları ve yapısal eksiklikleri anında tespit edilerek kullanıcıya bildirilir. Ayrıca, token türlerine göre uygulanan CSS sınıfları sayesinde, kod editöründe farklı öğeler renklendirilerek okunabilirlik ve kullanım kolaylığı sağlanır.
+
+Bu modüler ve genişletilebilir yapı, hem dil öğrenimi için interaktif bir araç olarak hem de basit programlama dillerinin analizinde temel bir altyapı olarak kullanılabilir.
 
 
