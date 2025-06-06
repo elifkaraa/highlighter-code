@@ -3,7 +3,7 @@ Bu proje, JavaScript benzeri bir dil için temel düzeyde bir **tokenizer** ve *
 Kod, kaynak kodu alır, onu tokenlara ayırır ve belirli dil yapıları için sözdizimsel analiz yapar.
 Not: Projede harici kütüphane kullanımı yasak olduğundan, tüm analizler kendi yazdığımız kodlarla gerçekleştirilmiştir.
 # 🎥 Demo & Kaynaklar
-# 📹 Demo Videosu: [YouTube'da İzle](https://youtu.be/diOKEUCPZmA)
+ 📹 Demo Videosu: [YouTube'da İzle](https://youtu.be/diOKEUCPZmA)
 # 🛠️ Teknik Altyapı
 Bu projede JavaScript programlama dili tercih edilmiştir. JavaScript'in web ortamında doğal olarak çalışabilmesi sayesinde, kolayca interaktif ve dinamik kullanıcı arayüzleri geliştirilmiştir.
 
